@@ -4,13 +4,44 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    TextView resultadoTextView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        resultadoTextView = (TextView) findViewById(R.id.textViewResultado);
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint("https://api.github.com")
+                .build();
+        ClienteService servicio = restAdapter.create(ClienteService.class);
+
+        servicio.getCliente(new Callback<List<Cliente>>() {
+            @Override
+            public void success(List<Cliente> clientes, Response response) {
+                resultadoTextView.setText(clientes.toString());
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                resultadoTextView.setText(retrofitError.getMessage());
+            }
+        });
     }
 
     @Override
